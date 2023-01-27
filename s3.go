@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/fs"
 	"io/ioutil"
+	"os"
 	"strings"
 	"time"
 
@@ -41,6 +42,27 @@ func init() {
 
 func (s3 *S3) Provision(context caddy.Context) error {
 	s3.Logger = context.Logger(s3)
+
+	if s3.Host == "" {
+		s3.Host = os.Getenv("S3_HOST")
+	}
+
+	if s3.Bucket == "" {
+		s3.Bucket = os.Getenv("S3_BUCKET")
+	}
+	s3.Logger.Info(fmt.Sprintf("s3 bucket: %v", s3.Bucket))
+
+	if s3.AccessKey == "" {
+		s3.AccessKey = os.Getenv("S3_ACCESS_KEY")
+	}
+
+	if s3.SecretKey == "" {
+		s3.SecretKey = os.Getenv("S3_SECRET_KEY")
+	}
+
+	if s3.Prefix == "" {
+		s3.Prefix = os.Getenv("S3_PREFIX")
+	}
 
 	// S3 Client
 	client, err := minio.New(s3.Host, &minio.Options{
